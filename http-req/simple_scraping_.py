@@ -5,7 +5,11 @@ import os
 from PIL import Image
 from IPython.display import IFrame
 
+import pandas as pd
+
 from urllib.parse import urljoin #for parsing wikipedia links
+
+from fontTools.misc.cython import returns
 
 url = "https://en.wikipedia.org/wiki/Spiking_neural_network"
 
@@ -22,7 +26,7 @@ def find_logo(url):
         resp = re.get(url, headers=headers)
         soup = bs(resp.text, 'html.parser')
 
-        #tag search
+        #tag search for wiki specifically
         logo_container = soup.find('a', {'class': 'mw-logo'})
         if logo_container:
             logo_img = logo_container.find('img')
@@ -30,6 +34,7 @@ def find_logo(url):
                 logo_url = logo_img['src']
                 return urljoin(url, logo_url)
 
+        #tag search for others
         logo_img = soup.find('img', {'src': True, 'alt': lambda x : x and 'logo' in x.lower()})
         if not logo_img:
             logo_img = soup.find('img', {'src': True, 'class': lambda x : x and 'logo' in x.lower()})
@@ -72,3 +77,9 @@ if logo_url:
         print(f"Error: HTTP STATUS CODE {r_.status_code}\n")
 else:
     print(f"Logo not found at {url}")
+
+url2 = 'https://en.wikipedia.org/wiki/List_of_largest_banks'
+
+data = pd.read_html(url2)
+table = data[2]
+print(table)
